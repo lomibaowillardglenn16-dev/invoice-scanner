@@ -1,61 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Invoice Scanner</title>
+  <title>Invoice Scanner (Debug)</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
-    .box { border: 1px solid #ccc; padding: 20px; border-radius: 12px; background: #fff; max-width: 400px; margin: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-    h2 { text-align: center; }
-    label { font-weight: bold; }
-    input, select, button { width: 100%; padding: 10px; margin: 8px 0; border-radius: 6px; border: 1px solid #ccc; }
-    button { background: #4CAF50; color: white; border: none; cursor: pointer; font-size: 16px; }
-    button:hover { background: #45a049; }
-    .success { color: green; margin-top: 12px; text-align: center; font-weight: bold; }
-    .error { color: red; margin-top: 12px; text-align: center; font-weight: bold; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .debug { background: #eee; padding: 10px; margin: 10px 0; }
   </style>
 </head>
 <body>
-  <div class="box">
-    <h2>Invoice Scanner</h2>
-    <form id="invoiceForm">
-      <label>Invoice No:</label>
-      <input type="text" id="invoiceNo" name="invoiceNo" readonly>
-
-      <label>Status:</label>
-      <select id="status" name="status" required>
-        <option value="">--Select--</option>
-        <option value="OUT">OUT</option>
-        <option value="RETURNED">RETURNED</option>
-      </select>
-
-      <button type="submit">Submit</button>
-    </form>
-
-    <div id="message"></div>
+  <h2>Invoice Scanner Debug</h2>
+  <div class="debug">
+    <p>🔍 Current URL: <span id="url"></span></p>
+    <p>📦 code param: <span id="code"></span></p>
   </div>
 
+  <form id="invoiceForm">
+    <label>Invoice No:</label><br>
+    <input type="text" id="invoiceNo" readonly><br><br>
+    <label>Status:</label><br>
+    <select id="status" required>
+      <option value="">--Select--</option>
+      <option value="OUT">OUT</option>
+      <option value="RETURNED">RETURNED</option>
+    </select><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="message"></div>
+
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
-
-    // Auto-fill invoiceNo from ?code= param
     const params = new URLSearchParams(window.location.search);
-    const code = params.get("code");
-    if (code) document.getElementById("invoiceNo").value = code;
+    const fullUrl = window.location.href;
+    const code = params.get('code') || params.get('q') || params.get('barcode') || '—';
 
-    document.getElementById("invoiceForm").addEventListener("submit", function(e) {
+    document.getElementById('url').innerText = fullUrl;
+    document.getElementById('code').innerText = code;
+
+    if (code && code !== '—') {
+      document.getElementById('invoiceNo').value = code;
+    }
+
+    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      const invoiceNo = document.getElementById("invoiceNo").value;
-      const status = document.getElementById("status").value;
+      const invoiceNo = document.getElementById('invoiceNo').value;
+      const status = document.getElementById('status').value;
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
 
-      document.getElementById("message").innerHTML = "<p>⏳ Sending data...</p>";
+      document.getElementById('message').innerHTML = "⏳ Sending data...";
 
       fetch(`${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=${encodeURIComponent(status)}`)
         .then(res => res.text())
         .then(text => {
-          document.getElementById("message").innerHTML = `<p class='success'>✅ ${text}</p>`;
+          document.getElementById('message').innerHTML = `<span style="color:green;">✅ ${text}</span>`;
         })
         .catch(err => {
-          document.getElementById("message").innerHTML = `<p class='error'>❌ Error: ${err}</p>`;
+          document.getElementById('message').innerHTML = `<span style="color:red;">❌ Error: ${err}</span>`;
         });
     });
   </script>
