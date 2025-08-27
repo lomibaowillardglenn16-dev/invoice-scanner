@@ -37,7 +37,7 @@
       }
 
       // ✅ palitan ng iyong Apps Script Web App URL
-      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec" target="hidden_iframe";
 
       const finalURL = `${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=${encodeURIComponent(status)}`;
 
@@ -58,3 +58,4 @@
   <button onclick="submitStatus()">Submit</button>
 </body>
 </html>
+
