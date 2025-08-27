@@ -1,30 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Invoice Scan Redirect</title>
-  <script>
-    window.onload = function () {
-      const urlParams = new URLSearchParams(window.location.search);
-      const invoiceNo = urlParams.get("code"); // galing sa TeaCapps scanner
-
-      if (!invoiceNo) {
-        document.body.innerHTML = "<h3>No code detected!</h3>";
-        return;
-      }
-
-      // ✅ palitan ng iyong Apps Script Web App URL
-      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
-
-      // Default status = OUT (pwede mo baguhin depende sa mode)
-      const finalURL = `${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=OUT`;
-
-      // Redirect to Apps Script
-      window.location.href = finalURL;
-    };
-  </script>
+  <title>Invoice Scanner</title>
 </head>
 <body>
-  <h3>Processing scan...</h3>
+  <h2>Invoice Status Update</h2>
+  <div id="output"></div>
+
+  <form id="statusForm">
+    <input type="hidden" id="invoiceNo" name="invoiceNo">
+    <label>Status:
+      <select id="status" name="status">
+        <option value="OUT">OUT</option>
+        <option value="RETURNED">RETURNED</option>
+      </select>
+    </label>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    // kunin yung "code" galing sa URL
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
+
+    if (code) {
+      document.getElementById("output").innerText = "Scanned Invoice: " + code;
+      document.getElementById("invoiceNo").value = code;
+    } else {
+      document.getElementById("output").innerText = "No invoice code detected.";
+    }
+
+    // kapag nag-submit, ipasa sa Google Apps Script
+    document.getElementById("statusForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const invoiceNo = document.getElementById("invoiceNo").value;
+      const status = document.getElementById("status").value;
+
+      // palitan mo ito ng sariling Web App URL mo
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
+
+      fetch(`${scriptURL}?invoiceNo=${invoiceNo}&status=${status}`)
+        .then(res => res.text())
+        .then(txt => alert("Response: " + txt))
+        .catch(err => alert("Error: " + err));
+    });
+  </script>
 </body>
 </html>
