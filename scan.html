@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice Scan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+    select, button {
+      font-size: 18px;
+      padding: 10px;
+      margin: 10px;
+    }
+  </style>
+  <script>
+    let invoiceNo = "";
+
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      invoiceNo = urlParams.get("code"); // galing sa TeaCapps scan
+
+      if (!invoiceNo) {
+        document.body.innerHTML = "<h3>No code detected!</h3>";
+      } else {
+        document.getElementById("code").innerText = invoiceNo;
+      }
+    };
+
+    function submitStatus() {
+      const status = document.getElementById("status").value;
+      if (!invoiceNo) {
+        alert("No invoice code detected!");
+        return;
+      }
+
+      // ✅ palitan ng iyong Apps Script Web App URL
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
+
+      const finalURL = `${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=${encodeURIComponent(status)}`;
+
+      window.location.href = finalURL; // redirect papunta sa script
+    }
+  </script>
+</head>
+<body>
+  <h2>Scanned Invoice:</h2>
+  <h1 id="code">Loading...</h1>
+
+  <h3>Select Status:</h3>
+  <select id="status">
+    <option value="OUT">OUT</option>
+    <option value="RETURNED">RETURNED</option>
+  </select>
+  <br>
+  <button onclick="submitStatus()">Submit</button>
+</body>
+</html>
