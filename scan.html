@@ -1,62 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Invoice Scanner</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    #message { margin-top: 15px; font-weight: bold; }
-  </style>
-</head>
-<body>
-  <h2>Invoice Scanner</h2>
-
-  <form id="invoiceForm">
-    <label>Invoice No:</label><br>
-    <input type="text" id="invoiceNo" readonly><br><br>
-
-    <label>Status:</label><br>
-    <select id="status" required>
-      <option value="">--Select--</option>
-      <option value="OUT">OUT</option>
-      <option value="RETURNED">RETURNED</option>
-    </select><br><br>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <div id="message"></div>
-
+  <meta charset="UTF-8">
+  <title>Invoice Scan Redirect</title>
   <script>
-    // Read URL params (works for ?code= or ?q=)
-    const params = new URLSearchParams(window.location.search);
-    const code = params.get('code') || params.get('q') || '';
+    window.onload = function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const invoiceNo = urlParams.get("code"); // galing sa TeaCapps scanner
 
-    if (code) {
-      document.getElementById('invoiceNo').value = code;
-    }
-
-    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const invoiceNo = document.getElementById('invoiceNo').value;
-      const status = document.getElementById('status').value;
-
-      if (!invoiceNo || !status) {
-        document.getElementById('message').innerHTML = "⚠️ Missing data.";
+      if (!invoiceNo) {
+        document.body.innerHTML = "<h3>No code detected!</h3>";
         return;
       }
 
+      // ✅ palitan ng iyong Apps Script Web App URL
       const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
-      document.getElementById('message').innerHTML = "⏳ Sending data...";
 
-      fetch(`${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=${encodeURIComponent(status)}`)
-        .then(res => res.text())
-        .then(text => {
-          document.getElementById('message').innerHTML = `<span style="color:green;">✅ ${text}</span>`;
-        })
-        .catch(err => {
-          document.getElementById('message').innerHTML = `<span style="color:red;">❌ Error: ${err}</span>`;
-        });
-    });
+      // Default status = OUT (pwede mo baguhin depende sa mode)
+      const finalURL = `${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=OUT`;
+
+      // Redirect to Apps Script
+      window.location.href = finalURL;
+    };
   </script>
+</head>
+<body>
+  <h3>Processing scan...</h3>
 </body>
 </html>
