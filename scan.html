@@ -1,42 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Invoice Scanner (Debug)</title>
+  <title>Invoice Scanner</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    .debug { background: #eee; padding: 10px; margin: 10px 0; }
+    #message { margin-top: 15px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h2>Invoice Scanner Debug</h2>
-  <div class="debug">
-    <p>🔍 Current URL: <span id="url"></span></p>
-    <p>📦 code param: <span id="code"></span></p>
-  </div>
+  <h2>Invoice Scanner</h2>
 
   <form id="invoiceForm">
     <label>Invoice No:</label><br>
     <input type="text" id="invoiceNo" readonly><br><br>
+
     <label>Status:</label><br>
     <select id="status" required>
       <option value="">--Select--</option>
       <option value="OUT">OUT</option>
       <option value="RETURNED">RETURNED</option>
     </select><br><br>
+
     <button type="submit">Submit</button>
   </form>
 
   <div id="message"></div>
 
   <script>
+    // Read URL params (works for ?code= or ?q=)
     const params = new URLSearchParams(window.location.search);
-    const fullUrl = window.location.href;
-    const code = params.get('code') || params.get('q') || params.get('barcode') || '—';
+    const code = params.get('code') || params.get('q') || '';
 
-    document.getElementById('url').innerText = fullUrl;
-    document.getElementById('code').innerText = code;
-
-    if (code && code !== '—') {
+    if (code) {
       document.getElementById('invoiceNo').value = code;
     }
 
@@ -44,8 +39,13 @@
       e.preventDefault();
       const invoiceNo = document.getElementById('invoiceNo').value;
       const status = document.getElementById('status').value;
-      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
 
+      if (!invoiceNo || !status) {
+        document.getElementById('message').innerHTML = "⚠️ Missing data.";
+        return;
+      }
+
+      const scriptURL = "https://script.google.com/macros/s/AKfycbyhWcenMggzMkH3bIPSrPMjCloy0TD10Ik7Y3ubfCVTRb6mpTreETAtAQkXJ9-UYg/exec";
       document.getElementById('message').innerHTML = "⏳ Sending data...";
 
       fetch(`${scriptURL}?invoiceNo=${encodeURIComponent(invoiceNo)}&status=${encodeURIComponent(status)}`)
